@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<style>
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#listTab th").click(function(event){
+    	sortTerm = $(event.target).attr("value");
+    	$('input[name="sortTerm"]').val(sortTerm);
+    	$("#form").submit();
+    });
+});
+</script>
+<body>
+    <h1>Contacts list</h1>
+  	<form action="list" th:attr="action=@{/list}" id="form" method="post">
+	  <fieldset>
+	  	<input type="hidden" name="sortTerm"/>
+	  	<select name="searchTerm">
+	  		<option value="name" th:selected="${searchTerm} =='name'">NAME</option>
+	  		<option value="phoneNumber" th:selected="${searchTerm} =='phoneNumber'">PHONE NUMBER</option>
+	  		<option value="address" th:selected="${searchTerm} =='address'">ADDRESS</option>
+	  	</select>
+	    <input type="text" name="searchValue" th:attr="value=${searchValue}"/>
+	    <input type="submit" value="search"/>
+	  </fieldset>
+	</form>
+    <table id="listTab">
+      <tr>
+        <th value="name">NAME↓</th>
+        <th value="phoneNumber">PHONE NUMBER↓</th>
+        <th value="address">ADDRESS↓</th>
+      </tr>
+      <tr th:each="contact : ${list}">
+        <td th:text="${contact.name}">Onions</td>
+        <td th:text="${contact.phoneNumber}">2.41</td>
+        <td th:text="${contact.address}">Rosary Road</td>
+      </tr>
+    </table>
+</body>
+</html>
