@@ -31,6 +31,9 @@ public class Utils {
 
 	public static List<Contact> getContact(String content) {
 		List<Contact> list = new ArrayList<>();
+		if(content==null||content.length()==0) {
+			return list;
+		}
 		JSONObject obj = new JSONObject(content);
 		JSONArray array = (JSONArray) obj.get("contacts");
 		for(int i = 0;i<array.length();i++) {

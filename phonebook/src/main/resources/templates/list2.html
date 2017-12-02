@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<style>
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+	function ListTable($table){
+		this.$table = $table;
+		//bind event to modify
+		this.addTdClick();
+		//bind event to delete
+		this.addDeleteClick();
+	}
+	//extract json format contacts
+	ListTable.prototype.getContact=function(){
+		var contacts="{contacts:[";
+		this.$table.find("tr:gt(0)").each(function(index){
+			if(index!=0){
+				contacts=contacts+","
+			}
+			contacts=contacts+"{"
+			$(this).find(".content").each(function(index){
+				if(index==0){
+					contacts=contacts+"\"name\":\"";
+				}else if(index==1){
+					contacts=contacts+",\"phone_number\":\"";
+				}else if(index==2){
+					contacts=contacts+",\"address\":\"";
+				}
+				contacts=contacts+$(this).text()+"\"";
+			});
+			contacts=contacts+"}";
+		});
+		contacts=contacts+"]}";
+		return contacts;
+	}
+	ListTable.prototype.addTdClick=function(){
+		this.$table.find(".content").unbind("click");
+		this.$table.find(".content").click(function(event){
+			$td = $(this);
+			if($td.find("input").length>0){
+				return;
+			}
+			content = $td.text();
+			$input = $("<input/>");
+			$input.val(content);
+			$input.blur(function(){
+				$(this).parent("td").html($(this).val());
+			});
+			$td.empty().append($input);
+			$input.focus();
+		});
+	}
+	ListTable.prototype.addDeleteClick=function(){
+		this.$table.find("button.delete").unbind("click");
+		this.$table.find("button.delete").click(function(){
+			$(this).parents("tr:first").remove();
+		});
+	};
+	ListTable.prototype.addContact=function(name,phoneNumber,address){
+		var $tr = $('<tr style="height:30px;"><td><button class="delete">delete</button></td></tr>')
+		$tr.append($('<td class="content"></td>').text(name));
+		$tr.append($('<td class="content"></td>').text(phoneNumber));
+		$tr.append($('<td class="content"></td>').text(address));
+		this.$table.append($tr);
+		//bind event to modify
+		this.addTdClick();
+		//bind event to delete
+		this.addDeleteClick();
+	};
+	
+	
+	listTable = new ListTable($("#listTab"));
+	$("#listTab th").click(function(event){
+    	var sortTerm = $(event.target).attr("value");
+    	$('input[name="sortTerm"]').val(sortTerm);
+    	$('input[name="contacts"]').val(listTable.getContact());
+    	$("#form").submit();
+    });
+	$("button.add").click(function(){
+		var $tr = $(this).parents("tr:first");
+		var name= $tr.find("td:eq(1)>input").val();
+		var phoneNumber= $tr.find("td:eq(2)>input").val();
+		var address= $tr.find("td:eq(3)>input").val();
+		if(name.length==0||phoneNumber.length==0||address.length==0){
+			alert("please complete the information.");
+			return;
+		}
+		listTable.addContact(name,phoneNumber,address);
+		$tr.find("td input").val("");
+	});
+});
+</script>
+<body>
+    <h1>Contacts list</h1>
+  	<form action="list3" th:attr="action=@{/list3}" id="form" method="post">
+	  <fieldset>
+	  	<input type="hidden" name="sortTerm"/>
+	  	<input type="hidden" name="contacts"/>
+	  	<select name="searchTerm">
+	  		<option value="name" th:selected="${searchTerm} =='name'">NAME</option>
+	  		<option value="phoneNumber" th:selected="${searchTerm} =='phoneNumber'">PHONE NUMBER</option>
+	  		<option value="address" th:selected="${searchTerm} =='address'">ADDRESS</option>
+	  	</select>
+	    <input type="text" name="searchValue" th:attr="value=${searchValue}"/>
+	    <input type="submit" value="search"/>
+	  </fieldset>
+	</form>
+    <table id="listTab">
+      <tr>
+      	<th></th>
+        <th value="name" style="width:180px;">NAME↓</th>
+        <th value="phoneNumber" style="width:180px;">PHONE NUMBER↓</th>
+        <th value="address">ADDRESS↓</th>
+      </tr>
+      <tr th:each="contact : ${list}" style="height:30px;">
+      	<td><button class="delete" >delete</button></td>
+        <td class="content" th:text="${contact.name}">Onions</td>
+        <td class="content" th:text="${contact.phoneNumber}">2.41</td>
+        <td class="content" th:text="${contact.address}">Rosary Road</td>
+      </tr>
+    </table>
+    <table id="addContact">
+    	<tr>
+    		<td><button class="add" >add</button></td>
+    		<td><input/></td>
+    		<td><input/></td>
+    		<td><input/></td>
+    	</tr>
+    </table>
+</body>
+</html>
