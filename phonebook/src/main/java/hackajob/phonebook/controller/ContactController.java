@@ -25,7 +25,7 @@ import hackajob.phonebook.resource.ContactResourceAssembler;
 @CrossOrigin(origins = "*")
 @RestController
 @ExposesResourceFor(Contact.class)
-@RequestMapping(value = "/Contact", produces = "application/json")
+@RequestMapping(value = "/contact", produces = "application/json")
 public class ContactController {
 	@Autowired
 	private ContactRepository repository;
